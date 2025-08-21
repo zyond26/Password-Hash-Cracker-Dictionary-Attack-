@@ -1,0 +1,18 @@
+*.Kiến thức cần có
+1.Hash ( hàm băm)
+- Một chiều : dễ tính từ pass -> hash nhưng gần như không đỏa ngược được
++) vd: MD5("hello") = 5d4140...
+
+2. weakness : nếu mật khẩu yếu, có thể thư nhiều pass rồi so sánh hash
+3. Dictonary attack : thay vì thử mọi tổ hợp ( brute-force), dùng 1 danh sách mật khẩu phổ biến ( password, 12345623456, admin)
+
+==> ý tưởng dự án , lấy hash cần crack -> duyệt qua từng từ trong wordlist -> băm từ đó -> nếu trùng thì tìm ra mật khẩu 
+
+
+** logic hoạt động của code 
+1. Nhập dữ liệu : hash cần crack , loại thuật toán (MD5/SHA1/SHA256), wordlist
+2. Đọc wordlist : lặp qua từng dòng
+3. Hash từng mật khẩu bằng thuật toán tương ứng
+4. So sánh : nếu hash tính ra == hash cần crack -> tìmm được mật khẩu
+5.Kết thúc : in ra kết quả hoặc báo " not  found "
+
