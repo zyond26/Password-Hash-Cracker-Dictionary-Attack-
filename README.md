@@ -4,16 +4,12 @@ Một công cụ nhỏ viết bằng Python để **crack mật khẩu từ các
 - **Dictionary Attack**: thử mật khẩu từ một wordlist có sẵn.
 - **Brute-force Attack**: thử tất cả chuỗi ký tự theo độ dài giới hạn.
 
----
-
 ## 📌 Mục tiêu dự án
 - Minh họa **rủi ro bảo mật** khi người dùng đặt mật khẩu yếu hoặc bị lộ dữ liệu.
 - Hiểu rõ hơn về:
   - Cơ chế hash (MD5, SHA1, SHA256).
   - Dictionary attack & brute-force attack.
   - Quản lý mật khẩu an toàn trong thực tế.
-
----
 
 ## ⚙️ Cài đặt & Chuẩn bị
 Yêu cầu:
