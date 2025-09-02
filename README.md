@@ -1,27 +1,39 @@
-# 🔑 Password Hash Cracker (Python)
+# 🔐 Password Hash Cracker (Educational Demo)
 
-Một công cụ nhỏ viết bằng Python để **crack mật khẩu từ các hash (MD5, SHA1, SHA256)** bằng 2 phương pháp:
-- **Dictionary Attack**: thử mật khẩu từ một wordlist có sẵn.
-- **Brute-force Attack**: thử tất cả chuỗi ký tự theo độ dài giới hạn.
+## 📌 Giới thiệu
+Dự án này là một **demo học tập** nhằm minh họa:
+- Cách hoạt động của hash function (MD5, SHA1, SHA256).
+- Cơ chế tấn công mật khẩu yếu bằng **dictionary attack** và **brute force**.
+- Vì sao mật khẩu yếu hoặc sử dụng thuật toán hash nhanh là **không an toàn**.
 
-## 📌 Mục tiêu dự án
-- Minh họa **rủi ro bảo mật** khi người dùng đặt mật khẩu yếu hoặc bị lộ dữ liệu.
-- Hiểu rõ hơn về:
-  - Cơ chế hash (MD5, SHA1, SHA256).
-  - Dictionary attack & brute-force attack.
-  - Quản lý mật khẩu an toàn trong thực tế.
+⚠️ **Lưu ý:** Dự án chỉ mang tính **giáo dục** và minh họa. Không sử dụng cho mục đích tấn công thực tế.
 
-## ⚙️ Cài đặt & Chuẩn bị
-Yêu cầu:
-- Python 3 (>=3.8).
-- Không cần cài thêm thư viện ngoài `hashlib`.
+---
 
-🚀 Cách sử dụng
-Dictionary Attack
+## 🚀 Tính năng
+- Hash mật khẩu với MD5, SHA1, SHA256.
+- Thử crack hash bằng:
+  - **Dictionary attack** (dùng wordlist mật khẩu phổ biến).
+  - **Brute force** (tạo chuỗi ký tự theo độ dài cho trước).
+- Demo với mật khẩu ngắn/yếu.
 
-Ví dụ crack MD5 của "hello" (5d41402abc4b2a76b9719d911017c592):
+---
 
-python hash_cracker.py --hash 5d41402abc4b2a76b9719d911017c592 --algo md5 --wordlist passwords.txt
+## 🛠️ Cài đặt & chạy
+### Yêu cầu
+- Python 3.8+
+- Không cần thư viện ngoài (chỉ dùng `hashlib`, `itertools`).
 
-===> kết quả là : [+] FOUND (dictionary): hello
+### Cách chạy
+```bash
+git clone https://github.com/zyond26/Password-Hash-Cracker-Dictionary-Attack-.git
+cd Password-Hash-Cracker-Dictionary-Attack-
 
++) Run in terminal :
+
+python hash_cracker.py
+
++) Run in web  
+
+- Cài đặt flask = lệnh pip install flask
+-Cài xong tthì chạy : python app.py 
