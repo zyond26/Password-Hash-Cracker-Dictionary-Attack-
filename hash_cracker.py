@@ -1,54 +1,103 @@
-import hashlib
-import itertools
-import string
-import argparse
 
-# Các thuật toán hỗ trợ
-SUPPORTED = {"md5": hashlib.md5, "sha1": hashlib.sha1, "sha256": hashlib.sha256}
+import hashlib          # thư viện hỗ trợ các thuật toán hash (MD5, SHA1, SHA256,...)
+import itertools        # hỗ trợ sinh ra các tổ hợp/kết hợp ký tự → dùng cho brute force
 
-def hash_word(word: str, algo: str) -> str:
-    """Tính hash của một mật khẩu bằng thuật toán cho trước"""
-    return SUPPORTED[algo](word.encode()).hexdigest()
+# Hàm hash mật khẩu
+def hash_password(password: str, algo: str = "md5") -> str:
+    """
+    Nhận vào mật khẩu dạng chuỗi và tên thuật toán (md5, sha1, sha256).
+    Trả về hash dạng hex string.
+    """
+    algo = algo.lower()  # chuẩn hóa tên thuật toán về chữ thường
+    if algo == "md5":
+        return hashlib.md5(password.encode()).hexdigest()
+    elif algo == "sha1":
+        return hashlib.sha1(password.encode()).hexdigest()
+    elif algo == "sha256":
+        return hashlib.sha256(password.encode()).hexdigest()
+    else:
+        raise ValueError("Thuật toán chưa hỗ trợ")  # báo lỗi nếu nhập thuật toán chưa có
 
-def crack_dictionary(target_hash: str, algo: str, wordlist: str):
-    """Dictionary attack: duyệt qua wordlist và so sánh"""
-    with open(wordlist, "r", encoding="utf-8", errors="ignore") as f:
-        for word in f:
-            word = word.strip()
-            if not word:
-                continue
-            if hash_word(word, algo) == target_hash:
-                print(f"[+] FOUND (dictionary): {word}")
-                return
-    print("[-] Not found in dictionary.")
+# Dictionary attack (in quá trình)
 
-def crack_bruteforce(target_hash: str, algo: str, max_length: int):
-    """Brute-force attack: thử tất cả chuỗi với độ dài từ 1 đến max_length"""
-    chars = string.ascii_lowercase + string.digits  # bảng ký tự: a-z, 0-9
-    for length in range(1, max_length + 1):
-        for candidate in itertools.product(chars, repeat=length):
-            word = "".join(candidate)
-            if hash_word(word, algo) == target_hash:
-                print(f"[+] FOUND (bruteforce): {word}")
-                return
-    print("[-] Not found in brute-force search.")
+def dictionary_attack_verbose(target_hash, wordlist, algo="md5"):
+    """
+    Dictionary attack có in log từng từ được thử.
+    """
+    attempt_count = 0
+    for word in wordlist:                       
+        attempt_count += 1
+        candidate = word.strip()  # bỏ xuống dòng/thừa khoảng trắng
+        candidate_hash = hash_password(candidate, algo)
 
-def main():
-    parser = argparse.ArgumentParser(description="Password Hash Cracker (Dictionary + Brute-force)")
-    parser.add_argument("--hash", required=True, help="Hash mục tiêu cần crack")
-    parser.add_argument("--algo", required=True, choices=SUPPORTED.keys(), help="Thuật toán: md5, sha1, sha256")
-    parser.add_argument("--wordlist", help="Đường dẫn wordlist (dictionary attack)")
-    parser.add_argument("--bruteforce", type=int, help="Dùng brute-force (tối đa độ dài n)")
-    args = parser.parse_args()
+        # In quá trình (chỉ in tối đa 20 lần đầu cho dễ nhìn)
+        if attempt_count <= 20:
+            print(f"Thử {attempt_count}: '{candidate}' → Hash = {candidate_hash}")
 
-    target_hash = args.hash.lower()
-    algo = args.algo.lower()
+        if candidate_hash == target_hash:  
+            print(f"\n[✔] Tìm thấy sau {attempt_count} lần thử!")
+            return candidate
+    return None
 
-    if args.wordlist:
-        crack_dictionary(target_hash, algo, args.wordlist)
 
-    if args.bruteforce:
-        crack_bruteforce(target_hash, algo, args.bruteforce)
+def load_wordlist_from_file(filename):
+    """
+    Đọc wordlist từ file password.txt
+    Mỗi dòng là 1 mật khẩu.
+    """
+    try:
+        with open(filename, "r", encoding="utf-8") as f:
+            return f.readlines()  # trả về list các dòng
+    except FileNotFoundError:
+        print(f"[!] Không tìm thấy file {filename}")
+        return []
 
+# Brute force attack 
+def brute_force_attack_verbose(target_hash, max_length=4, algo="md5"):
+ 
+    chars = "abcdefghijklmnopqrstuvwxyz0123456789"
+    attempt_count = 0  # đếm số lần thử
+
+    for length in range(1, max_length + 1):            
+        for guess in itertools.product(chars, repeat=length):  
+            guess = "".join(guess)
+            attempt_count += 1
+            guess_hash = hash_password(guess, algo)
+
+            # In quá trình (thử tối đa 30 lần đầu để không quá dài)
+            if attempt_count <= 30:
+                print(f"Thử {attempt_count}: '{guess}' → Hash = {guess_hash}")
+
+            if guess_hash == target_hash:
+                print(f"\n[✔] Tìm thấy sau {attempt_count} lần thử!")
+                return guess
+    print(f"\n[!] Đã thử {attempt_count} khả năng nhưng không tìm thấy.")
+    return None
+
+
+# demo main
 if __name__ == "__main__":
-    main()
+    password = input("Nhập mật khẩu gốc để demo: ").strip()
+    algo = "md5"
+    hashed = hash_password(password, algo)
+
+    print(f"\n[+] Mật khẩu gốc: {password}")
+    print(f"[+] Hash ({algo.upper()}): {hashed}")
+
+    # ============= Dictionary attack (dùng wordlist trong code)
+    print("\n[Dictionary Attack - wordlist có sẵn]")
+    wordlist = ["123456", "password", "qwerty", "abc123", "111111", "letmein", "Hello", "admin"]
+    result = dictionary_attack_verbose(hashed, wordlist, algo)
+    print("Kết quả:", result if result else "Không tìm thấy")
+
+    # ============= Dictionary attack (dùng wordlist từ file)
+    print("\n[Dictionary Attack - từ file password.txt]")
+    file_wordlist = load_wordlist_from_file("password.txt")
+    if file_wordlist:
+        result = dictionary_attack_verbose(hashed, file_wordlist, algo)
+        print("Kết quả:", result if result else "Không tìm thấy")
+
+    # ============= Brute force attack (demo mật khẩu ngắn)
+    print("\n[Brute Force Attack]")
+    result = brute_force_attack_verbose(hashed, max_length=6, algo=algo)
+    print("Kết quả:", result if result else "Không crack được")
